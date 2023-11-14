@@ -1,10 +1,12 @@
 from langchain.llms.base import LLM
 from langchain.prompts import ChatPromptTemplate, FewShotChatMessagePromptTemplate
-import ChatIO
+from prompts.prompt_formatting import ChatIO
+from chains import ChatChainInterface
 
 
 def as_template(name: str):
     return "".join(["{", name, "}"])
+
 
 """
 To chain with LCEL: let's say you have a PromptTuner object called prompt_tuner
@@ -14,13 +16,12 @@ chain = prompt_tuner.chain | prompt_tuner2.chain | ...
 
 and you get the idea
 """
-class PromptTuner:
+class PromptTuner(ChatChainInterface):
     def __init__(self, llm: LLM, sys_initial_prompt: str, few_shot_examples: list[ChatIO], input_name="input", output_name="output"):
-        super()
+        super().__init__(input_name)
         self.llm = llm
         self._sys_initial_prompt = sys_initial_prompt
         self._few_shot_examples = few_shot_examples
-        self.input_name = input_name
         self.output_name = output_name
 
         # Few Shot Learning
@@ -40,7 +41,4 @@ class PromptTuner:
         ])
 
         self.chain = (self.chat_prompt_template | self.llm)
-    
-    def chat(self, input: str):
-        return self.chain.invoke({self.input_name: input})
 

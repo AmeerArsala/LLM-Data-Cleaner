@@ -1,1 +1,0 @@
-TERM_DELIMITER = '`'
