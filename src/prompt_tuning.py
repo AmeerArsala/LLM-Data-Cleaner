@@ -41,26 +41,3 @@ class PromptTuner(ChatChainInterface):
 
         self.chain = (self.chat_prompt_template | self.llm)
 
-"""
-Usage example to clean all columns:
-
-import pandas as pd
-
-df = pd.read_csv("my_dataset.csv")
-
-import prompts.typofix as typofix
-import prompts.chunker as chunker
-from chains import ChatChain
-from data_cleaning import clean_df
-
-typofix_ptuner = PromptTuner(ChatAnthropic(), typofix.FEW_SHOT_PROMPT)
-chunker_ptuner = PromptTuner(ChatAnthropic(), chunker.FEW_SHOT_PROMPT)
-
-# put it all together
-chain = typofix_ptuner.chain | chunker_ptuner.chain
-prod_chain = ChatChain(chain)
-
-# clean the WHOLE DataFrame
-df_cleaned = clean_df(prod_chain, df)
-"""
-
