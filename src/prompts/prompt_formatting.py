@@ -15,3 +15,10 @@ class ChatIO:
     # Assume chat_ios is a list of ChatIO
     def make_chat(chat_ios: list[ChatIO], input_name: str, output_name: str):
         return [chat_io.as_dict(input_name, output_name) for chat_io in chat_ios]
+
+
+class FewShotPrompt:
+    def __init__(self, sys_initial_prompt: str, few_shot_examples: list[ChatIO]):
+        super().__init__()
+        self.sys_initial_prompt = sys_initial_prompt
+        self.examples = few_shot_examples

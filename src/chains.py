@@ -14,6 +14,6 @@ class ChatChainInterface:
 
 # For production
 class ChatChain(ChatChainInterface):
-    def __init__(self, chain, input_name: str):
+    def __init__(self, chain, input_name="input"):
         super().__init__(input_name)
         self.chain = chain

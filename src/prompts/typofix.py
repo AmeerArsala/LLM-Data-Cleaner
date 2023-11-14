@@ -1,8 +1,7 @@
-import ChatIO
-import cut_ends
+from prompt_formatting import FewShotPrompt, ChatIO, cut_ends
 
 # Prompt Template
-SYSPROMPT_TEMPLATE = cut_ends('''
+sys_prompt_template = cut_ends('''
 Your role is to fix typos. For every typo/list of typos made that is given, you are to reproduce that list in the same order as was given to you, but with the fixed versions. If it is correct, leave it as is.
 
 Here's what constitutes as a typo and how they should be fixed:
@@ -84,9 +83,11 @@ _few_shot_3o = cut_ends('''
 ''')
 
 # Putting the Few-Shot Examples all together
-FEW_SHOT_EXAMPLES = [
+few_shot_examples = [
     ChatIO(_few_shot_1i, _few_shot_1o),
     ChatIO(_few_shot_2i, _few_shot_2o),
     ChatIO(_few_shot_3i, _few_shot_3o)
 ]
 
+# PUT EVERYTHING TOGETHER
+FEW_SHOT_PROMPT = FewShotPrompt(sys_prompt_template, few_shot_examples)

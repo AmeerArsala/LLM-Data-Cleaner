@@ -1,8 +1,7 @@
-import ChatIO
-import cut_ends
+from prompt_formatting import FewShotPrompt, ChatIO, cut_ends
 
 # Prompt Template
-SYSPROMPT_TEMPLATE = cut_ends('''
+sys_prompt_template = cut_ends('''
 You are profiling cases of missing people by looking at the category that represents them. Your role is to chunk terms that basically mean the same thing into a single common term (example: 'horse rider', 'horseback riding', and 'horseback' can be chunked into 'horseback rider'). For every term/list of terms that is given, you are to reproduce that list in the same order as was given to you, but with the chunked versions.
 
 Here's what constitutes whether/how you should chunk a term or not:
@@ -78,8 +77,11 @@ _few_shot_3o = cut_ends('''
 ''')
 
 # Putting the Few-Shot Examples all together
-FEW_SHOT_EXAMPLES = [
+few_shot_examples = [
     ChatIO(_few_shot_1i, _few_shot_1o),
     ChatIO(_few_shot_2i, _few_shot_2o),
     ChatIO(_few_shot_3i, _few_shot_3o)
 ]
+
+# PUT EVERYTHING TOGETHER
+FEW_SHOT_PROMPT = FewShotPrompt(sys_prompt_template, few_shot_examples)

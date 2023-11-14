@@ -95,3 +95,8 @@ def clean_df(chain_interface: ChatChainInterface, df: pd.DataFrame, cols: list, 
         clean_column(chain_interface, df, col, batch_size=batch_size, copy=False)
     
     return df_
+
+
+# Clean the WHOLE DataFrame (all columns)
+def clean_df(chain_interface: ChatChainInterface, df: pd.DataFrame, batch_size=-1, copy=True):
+    return clean_df(chain_interface, df, df.columns, batch_size=batch_size, copy=copy)
