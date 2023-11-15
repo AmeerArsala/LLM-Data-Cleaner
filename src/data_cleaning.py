@@ -22,13 +22,13 @@ def wrap_delimiters(cols):
 
 
 # Assumes everything's lowercase
-def prechain_string(unique_strs):
+def prechain_string(strs: list) -> str:
     # Wrap each string in ticks and join each string by new line into a single string
-    return "\n".join(wrap_delimiters(unique_strs))
+    return "\n".join(wrap_delimiters(strs))
 
 
 # Undo the delimiters and separate back into a list of strings
-def postchain_mappings(chain_output: str):
+def postchain_mappings(chain_output: str) -> list:
     outputs = chain_output.split("\n")
 
     # Remove the delimiters
@@ -36,50 +36,64 @@ def postchain_mappings(chain_output: str):
 
     return cleaned_output
 
-
-# Inference without postprocessing
-def raw_inference_clean(chain_interface: ChatChainInterface, strs_before):
+def raw_chain_inference(chain_interface: ChatChainInterface, strs_before) -> str:
     # call the whole chain
     chain_input = prechain_string(strs_before)
-    chain_output = chain_interface.run_chat(chain_input)
+    chain_inference = chain_interface.run_chat(chain_input)
+    
+    #print(f"Inference: {chain_inference}")
 
-    return chain_output
+    # Format away from 'AI: '
+    # If this results in an error, use a better LLM
+    #start_idx = chain_inference.index("`")
+    #chain_inference = chain_inference[start_idx:]
+
+    return chain_inference
+
+
+# Inference without postprocessing
+def safe_chain_inference(chain_interface: ChatChainInterface, strs_before, batch_size=-1) -> str:
+    if batch_size <= 0:
+        return raw_chain_inference(chain_interface, strs_before)
+
+    # Use batches
+    chain_output_batches = []
+    i_current = 0
+    chain_output_len = len(strs_before)
+    while i_current < chain_output_len:
+        actual_batch_size = min(batch_size, chain_output_len - i_current)
+
+        chain_input_batch = strs_before[i_current:(i_current+actual_batch_size)]
+        print(f"Current: {chain_input_batch}")
+
+        chain_output_batch = raw_chain_inference(chain_interface, chain_input_batch)
+        print(f"Resulting Batch: {chain_output_batch}")
+
+        chain_output_batches.append(chain_output_batch)
+
+        i_current += actual_batch_size 
+
+    print(chain_output_batches)
+    print()
+
+    # Join the batches for the chain output
+    return "".join(chain_output_batches)
 
 
 # Inference with postprocessing
-def inference_clean(chain_interface: ChatChainInterface, strs_before, batch_size=-1):
-    if batch_size <= 0:
-        chain_output = raw_inference_clean(chain_interface, strs_before)
-        return postchain_mappings(chain_output)  # postprocessing
-    else:
-        # Do it in batches if this is the case
-        strs_after = []
-        i_current = 0
-        while len(strs_after) < len(strs_before):
-            actual_batch_size = min(batch_size, len(strs_before) - len(strs_after))
+def inference_clean(chain_interface: ChatChainInterface, strs_before, batch_size=-1) -> list:
+    chain_output = safe_chain_inference(chain_interface, strs_before, batch_size=batch_size)
+    strs_after = postchain_mappings(chain_output)  # postprocessing
 
-            chain_output = raw_inference_clean(chain_interface, strs_before[i_current:(i_current+actual_batch_size)])
-            strs_after = strs_after + postchain_mappings(chain_output)
-
-            i_current += actual_batch_size
-        
-        return strs_after
-
-
-# Mappings from before and after snapshots
-def inference_clean_mappings(chain_interface: ChatChainInterface, df: pd.DataFrame, col: str, batch_size=-1):
-    # Cache snapshot of 'before'
-    strs_before = df[col].unique()
-
-    # call the whole chain with postprocessing
-    strs_after = inference_clean(chain_interface, strs_before, batch_size=batch_size)
-
-    return mappings.create_mappings_dict(strs_before, strs_after)
+    return strs_after
 
 
 # Mappings from before and after snapshots; a full pipeline to clean a column
 def clean_column(chain_interface: ChatChainInterface, df: pd.DataFrame, col: str, batch_size=-1, copy=True):
-    mappings_dict = inference_clean_mappings(chain_interface, df, col, batch_size=batch_size)
+    strs_before = df[col].unique()
+    strs_after = inference_clean(chain_interface, strs_before, batch_size=batch_size)
+    
+    mappings_dict = mappings.create_mappings_dict(strs_before, strs_after)  # Mappings from before and after snapshots
 
     df_ = df.copy() if copy else df
     df_[col].map(lambda str_val: mappings_dict[str_val])

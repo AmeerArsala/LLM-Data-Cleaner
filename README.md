@@ -8,12 +8,12 @@ import pandas as pd
 
 df = pd.read_csv("my_dataset.csv")
 
-import prompts.typofix as typofix
-import prompts.chunker as chunker
-from mlmodels.apis import HUGGINGFACE_APIs as HF
-from mlmodels.models import HuggingFaceLLM
+from prompt_tuning import PromptTuner
+from prompts import typofix, chunker
+from ml_models.apis import HUGGINGFACE_APIs as HF
+from ml_models.models import HuggingFaceLLM
 from chains import ChatChain
-from data_cleaning import clean_df
+import data_cleaning as dcl
 
 typofix_ptuner = PromptTuner(HuggingFaceLLM(api=HF.Falcon_7b_Instruct), typofix.FEW_SHOT_PROMPT)
 chunker_ptuner = PromptTuner(HuggingFaceLLM(api=HF.Falcon_7b_Instruct), chunker.FEW_SHOT_PROMPT)
@@ -23,5 +23,5 @@ chain = typofix_ptuner.chain | chunker_ptuner.chain
 prod_chain = ChatChain(chain)
 
 # clean the WHOLE DataFrame
-df_cleaned = clean_df(prod_chain, df)
+df_cleaned = dcl.clean_df(prod_chain, df)
 ```

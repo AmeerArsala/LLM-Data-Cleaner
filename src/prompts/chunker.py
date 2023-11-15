@@ -1,4 +1,4 @@
-from prompt_formatting import FewShotPrompt, ChatIO, cut_ends
+from prompts.prompt_formatting import FewShotPrompt, ChatIO, cut_ends
 
 # Prompt Template
 sys_prompt_template = cut_ends('''
@@ -12,7 +12,7 @@ Here's what constitutes whether/how you should chunk a term or not:
 Do NOT chunk if:
 - There exists not a single term, but a lengthy description containing many terms
 
-When providing each example, I will separate each of them with ticks (`) So that you know which example is which
+When providing each example, I will separate each of them with ticks (`) So that you know which example is which.
 ''')
 
 # Few-Shot Examples

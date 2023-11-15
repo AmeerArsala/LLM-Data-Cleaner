@@ -13,7 +13,7 @@ class ChatIO:
         return {input_name: self.input_text, output_name: self.output_text}
     
     # Assume chat_ios is a list of ChatIO
-    def make_chat(chat_ios: list[ChatIO], input_name: str, output_name: str):
+    def make_chat(chat_ios: list, input_name: str, output_name: str):
         return [chat_io.as_dict(input_name, output_name) for chat_io in chat_ios]
 
 

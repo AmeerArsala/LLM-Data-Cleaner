@@ -25,8 +25,8 @@ class PromptTuner(ChatChainInterface):
 
         # Few Shot Learning
         example_few_shot_prompt = ChatPromptTemplate.from_messages([
-            ("human", as_template(input_name)),
-            ("ai", as_template(output_name))
+            ("user", as_template(input_name)),
+            ("assistant", as_template(output_name))
         ])
 
         few_shot_examples_dict = ChatIO.make_chat(few_shot_prompt.examples, input_name, output_name)
@@ -36,8 +36,10 @@ class PromptTuner(ChatChainInterface):
         self.chat_prompt_template = ChatPromptTemplate.from_messages([
             ("system", few_shot_prompt.sys_initial_prompt),
             few_shot_chat_prompt,
-            ("human", as_template(input_name))
+            ("user", as_template(input_name))
         ])
 
         self.chain = (self.chat_prompt_template | self.llm)
 
+    def run_chat(self, text: str):
+        return self.chain.invoke({self.input_name: f"Before:\n[{text}\n]"})
