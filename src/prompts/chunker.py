@@ -85,3 +85,6 @@ few_shot_examples = [
 
 # PUT EVERYTHING TOGETHER
 FEW_SHOT_PROMPT = FewShotPrompt(sys_prompt_template, few_shot_examples)
+
+# Settings
+WRAP_INPUT = "[]"

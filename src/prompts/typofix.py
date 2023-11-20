@@ -2,21 +2,25 @@ from prompts.prompt_formatting import FewShotPrompt, ChatIO, cut_ends
 
 # Prompt Template
 sys_prompt_template = cut_ends('''
-Your role is to fix typos. For every typo/list of typos made that is given, you are to reproduce that list in the same order as was given to you, but with the fixed versions. If a term is correct, leave it as is. Also, for each item in the list you produce, you must surround it with ticks (`).
+Your role is to fix typos in order to clean data. For every typo/list of typos made that is given, you are to reproduce that list in the same order as was given to you, but with the fixed versions. If a term is correct, leave it as is. Also, for each item in the list you produce, you must surround it with ticks (`).
 
 Here's what constitutes as a typo and how they should be fixed:
 - Misspelled words -> Fix: spell them correctly
 - Anything that includes nonsensical characters (such as periods and unneeded hyphens/dashes) -> Fix: remove them
 - Weird or odd spacing -> Fix: fix the spacing to make more sense 
 - If it includes a hyphen to denote 'definition' (such as "Topic - subtopic") rather than being part of the word (such as "editor-in-chief") -> Fix: use colons such as "Topic: subtopic" instead of "Topic - subtopic"
-
-Each item will be labeled with ticks (`) so that you know which item is which.
 ''')
+
+_formatting_deprecated = cut_ends("""
+Here's how you should format the list:
+- Keep in mind that the list is a list of the fixed versions of the list that is inputted. You are to ONLY output the resulting list and nothing beyond the end of it
+- A list starts and ends with brackets. The whole list is enclosed within these brackets [], meaning that each item you produce will be within these brackets. A list starts with an opening bracket ([) and ends with a closing bracket (]). Do not output anything else afterwards.
+- You may ONLY end the list (by using the closing bracket ']') once the length of items in your list is the same as the input list. That is, you should be able to generate a mapping from each item in the input list to each item in the output list.
+- Each item within the list will be labeled with ticks (`) so that we can tell which item is which
+""")
 
 # Few-Shot Examples
 _few_shot_1i = cut_ends('''
-Before:
-[
 `catt`
 `hunter-`
 `huner`
@@ -29,12 +33,9 @@ Before:
 `dog_`
 `aircraft   e-`
 `flood***victimss`
-]
 ''')
 
 _few_shot_1o = cut_ends('''
-After:
-[
 `cat`
 `hunter`
 `hunter`
@@ -47,12 +48,9 @@ After:
 `dog`
 `aircraft`
 `flood victims`
-]
 ''')
 
 _few_shot_2i = cut_ends('''
-Before:
-[
 `sight seerer`
 `skier -nordic`
 `reservore`
@@ -61,12 +59,9 @@ Before:
 `ice..fishing`
 `child$$$4-6.`
 `stranded_`
-]
 ''')
 
 _few_shot_2o = cut_ends('''
-After:
-[
 `sightseer`
 `skier: nordic`
 `reservoir`
@@ -75,43 +70,30 @@ After:
 `ice fishing`
 `child 4-6`
 `stranded`
-]
 ''')
 
 _few_shot_3i = cut_ends('''
-Before:
-[
 `potata`
 `kuwi`
 `hamewark`
 `phzsicz`
 `fomula ine`
-]
 ''')
 
 _few_shot_3o = cut_ends('''
-After:
-[
 `potato`
 `kiwi`
 `homework`
 `physics`
 `formula one`
-]
 ''')
 
 _few_shot_4i = cut_ends('''
-Before:
-[
 `act1v..ati on$`
-]
 ''')
 
 _few_shot_4o = cut_ends('''
-After:
-[
 `activation`
-]
 ''')
 
 # Putting the Few-Shot Examples all together
@@ -125,7 +107,8 @@ few_shot_examples = [
 # PUT EVERYTHING TOGETHER
 FEW_SHOT_PROMPT = FewShotPrompt(sys_prompt_template, few_shot_examples)
 
-
+# Settings
+WRAP_INPUT = "[]"
 
 
 # Text Completion Prompt

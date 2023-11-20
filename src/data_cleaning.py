@@ -16,9 +16,10 @@ B. We need to separate each string by line in order to put it into LangChain
 """
 
 
-# 2: ensuring that each example is wrapped in delimiter ticks (`), assuming it isn't already
+# ensuring that each example is wrapped in delimiter ticks (`), assuming it isn't already
+# ensuring that it isn't already using ticks (`) by replacing them with $
 def wrap_delimiters(cols):
-    return ["".join(["`", col, "`"]) for col in cols]
+    return ["".join(["`", col.replace("`", "$"), "`"]) for col in cols]
 
 
 # Assumes everything's lowercase
@@ -67,14 +68,15 @@ def safe_chain_inference(chain_interface: ChatChainInterface, strs_before, batch
         print(f"Current: {chain_input_batch}")
 
         chain_output_batch = raw_chain_inference(chain_interface, chain_input_batch)
-        print(f"Resulting Batch: {chain_output_batch}")
+
+        print(f"Resulting Batch: {chain_output_batch}\nEND")
 
         chain_output_batches.append(chain_output_batch)
 
         i_current += actual_batch_size 
 
-    print(chain_output_batches)
-    print()
+    print(f"\nOUTPUT: {chain_output_batches}")
+    print("DONE")
 
     # Join the batches for the chain output
     return "".join(chain_output_batches)
