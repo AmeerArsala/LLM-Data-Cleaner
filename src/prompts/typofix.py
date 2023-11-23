@@ -1,4 +1,6 @@
 from prompts.prompt_formatting import FewShotPrompt, ChatIO, cut_ends
+from langchain.llms.base import LLM
+
 
 # Prompt Template
 sys_prompt_template = cut_ends('''
@@ -96,6 +98,7 @@ _few_shot_4o = cut_ends('''
 `activation`
 ''')
 
+
 # Putting the Few-Shot Examples all together
 few_shot_examples = [
     ChatIO(_few_shot_1i, _few_shot_1o),
@@ -104,11 +107,17 @@ few_shot_examples = [
     ChatIO(_few_shot_4i, _few_shot_4o)
 ]
 
+
 # PUT EVERYTHING TOGETHER
 FEW_SHOT_PROMPT = FewShotPrompt(sys_prompt_template, few_shot_examples)
 
+
 # Settings
 WRAP_INPUT = "[]"
+
+
+def few_shot_llm(llm: LLM):
+    return FewShotLLM(llm, FEW_SHOT_PROMPT, wrap_input=WRAP_INPUT)
 
 
 # Text Completion Prompt

@@ -5,6 +5,7 @@ from prompts.prompt_formatting import ChatIO, FewShotPrompt
 from langchain.schema.runnable.config import RunnableConfig
 
 
+# Prompt Template: surround with {} in order to be a templated input
 def ptmplt(name: str):
     return "".join(["{", name, "}"])
 
@@ -93,4 +94,4 @@ class FewShotLLM(ChatChainInterface):
             recursion_limit=25  # default value
         )"""
 
-        return self.chain.invoke({self.input_name: text}) #config=chain_config)
+        return self.chain.invoke({self.input_name: text}) #, config=chain_config)

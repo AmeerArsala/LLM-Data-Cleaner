@@ -37,17 +37,19 @@ def postchain_mappings(chain_output: str) -> list:
 
     return cleaned_output
 
-def raw_chain_inference(chain_interface: ChatChainInterface, strs_before) -> str:
+def raw_chain_inference(chain_interface: ChatChainInterface, strs_before, format_raw=True) -> str:
     # call the whole chain
     chain_input = prechain_string(strs_before)
     chain_inference = chain_interface.run_chat(chain_input)
     
     #print(f"Inference: {chain_inference}")
 
-    # Format away from 'AI: '
-    # If this results in an error, use a better LLM
-    #start_idx = chain_inference.index("`")
-    #chain_inference = chain_inference[start_idx:]
+    if format_raw:
+        # Format away from "AI: " and "User: " 
+        # If this results in an error, use a better LLM
+        start_idx = chain_inference.index("`")
+        trunc_idx = chain_inference.index("User:")
+        chain_inference = chain_inference[start_idx:trunc_idx]
 
     return chain_inference
 
