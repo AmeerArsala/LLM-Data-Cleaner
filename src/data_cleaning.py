@@ -48,8 +48,14 @@ def raw_chain_inference(chain_interface: ChatChainInterface, strs_before, format
         # Format away from "AI: " and "User: " 
         # If this results in an error, use a better LLM
         start_idx = chain_inference.index("`")
-        trunc_idx = chain_inference.index("User:")
-        chain_inference = chain_inference[start_idx:trunc_idx]
+
+        remaining_occurrences = (2 * len(strs_before)) - 1
+        last_idx = start_idx  # set index to first occurrence
+        for o in range(remaining_occurrences):
+            last_idx = chain_inference.index("`", last_idx + 1)
+
+        #trunc_idx = chain_inference.rindex("`") + 1
+        chain_inference = chain_inference[start_idx:last_idx+1]
 
     return chain_inference
 
